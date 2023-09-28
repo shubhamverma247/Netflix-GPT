@@ -1,17 +1,26 @@
 import React from "react";
 import Header from "./Header";
-import useNowPlayingMoveis from "../hooks/usePopularMovies";
+import useNowPlayingMoviesnew from "../hooks/useNowPlayingMoviesnew";
 import MainContainer from "./MainContainer";
 import SecondaryContainer from "./SecondaryContainer";
 import usePopularMoveis from "../hooks/usePopularMovies";
+import GptSearchPage from "./GptSearchPage";
+import { useSelector } from "react-redux";
 const Browse = () => {
-  useNowPlayingMoveis();
+  const gptSearch = useSelector((store) => store.gpt.toggleGPT);
+  useNowPlayingMoviesnew();
   usePopularMoveis();
   return (
     <div>
       <Header />
-      <MainContainer />
-      <SecondaryContainer />
+      {gptSearch ? (
+        <GptSearchPage />
+      ) : (
+        <>
+          <MainContainer />
+          <SecondaryContainer />
+        </>
+      )}
     </div>
   );
 };

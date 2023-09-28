@@ -1,15 +1,19 @@
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { auth } from "../utils/firebase";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { addUser, removeUser } from "../utils/userSlice";
+import { toggleGPTSearch } from "../utils/gptSlice";
+import { LOGO_URL, SUPPORTED_LANGUAGES } from "../utils/constants";
+import { changeLanguage } from "../utils/configSlice";
 
 const Header = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
+  const language = useRef(null);
   const user = useSelector((store) => store.user);
+  const showGptSearch = useSelector((store) => store.gpt.toggleGPT);
   const handleSignOut = () => {
     signOut(auth)
       .then(() => {
@@ -20,7 +24,13 @@ const Header = () => {
         navigate("/error");
       });
   };
-
+  const handleToggle = () => {
+    dispatch(toggleGPTSearch());
+  };
+  const handleLanguageChange = (e) => {
+    // or we can use e.target.value
+    dispatch(changeLanguage(language.current.value));
+  };
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -47,13 +57,26 @@ const Header = () => {
   }, []);
   return (
     <div className="absolute w-screen px-8 py-2 bg-gradient-to-b from-black z-10 flex justify-between">
-      <img
-        className="w-44"
-        alt="logo"
-        src="https://cdn.cookielaw.org/logos/dd6b162f-1a32-456a-9cfe-897231c7763c/4345ea78-053c-46d2-b11e-09adaef973dc/Netflix_Logo_PMS.png"
-      />
+      <img className="w-44" alt="logo" src={LOGO_URL} />
       {user && (
         <div className="flex mt-2">
+          {showGptSearch && (
+            <select
+              ref={language}
+              className=" mx-4 bg-gray-600 px-2 text-white h-8"
+              onChange={handleLanguageChange}>
+              {SUPPORTED_LANGUAGES.map((language) => (
+                <option key={language.identifier} value={language.identifier}>
+                  {language.name}
+                </option>
+              ))}
+            </select>
+          )}
+          <button
+            className="px-2 h-8 bg-purple-900 mr-4 text-white font-bold rounded-md"
+            onClick={handleToggle}>
+            {showGptSearch ? "Home Page" : "GPT Search"}
+          </button>
           <img className="w-8 h-8 px-1" alt="user" src={user.photoURL} />
           <button
             onClick={handleSignOut}
