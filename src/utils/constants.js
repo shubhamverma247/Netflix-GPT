@@ -19,7 +19,7 @@ export const SUPPORTED_LANGUAGES = [
   { identifier: "Spanish", name: "Spanish" },
 ];
 
-export const OPENAI = "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";
+export const OPENAI = process.env.REACT_APP_OPENAI_APIKEY;
 export const gptQueryStart =
   "Act as a Movie Recommendation system and suggest some movies for the query : ";
 export const gptQueryEnd =
